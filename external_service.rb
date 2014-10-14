@@ -1,9 +1,10 @@
 require 'securerandom'
-require 'socket'
 
 require 'bundler/setup'
 require 'json'
 require 'sinatra'
+
+require 'common'
 
 $FAILURE_RATE  = 0
 $FAILURE_SCALE = 100
@@ -16,12 +17,6 @@ module FailureRate
   end
 end
 
-module Timestamp
-  def self.now
-    Time.now.strftime('%Y%m%d%H%M%S (%z)')
-  end
-end
-
 class Token
   attr_reader :timestamp, :token
 
@@ -30,7 +25,7 @@ class Token
   end
 
   def hostname
-    @hostname ||= Socket.gethostname
+    @hostname ||= Hostname.local_hostname
   end
 
   def timestamp

@@ -10,12 +10,16 @@ A collection of tiny services demonstrating a collection of techniques to add Se
 
 ### Base Service
 
+```text
+RACK_ENV=production ruby -I . service.rb -p 80
+```
+
 ### External Service
 
 This is a small service that is intended to demonstrate an external dependency for the base system. It can be run via the following command:
 
 ```text
-RACK_ENV=production ruby external_service.rb -p 80
+RACK_ENV=production ruby -I . external_service.rb -p 80
 ```
 
 There is a built-in failure threshold that can be set to simulate errors in HTTP responses. See below for further details.
@@ -44,12 +48,15 @@ Returns a representation of a token, including a timestamp and hostname.
 curl http://external-service.example.org/failure_rate
 ```
 
+## Dependencies
 
-
-
+* Ruby 2.1.2
+* curl
 
 ## Resources
 
 * [Consul HTTP API documentation](http://www.consul.io/docs/agent/http.html)
 * https://www.digitalocean.com/community/tutorials/an-introduction-to-using-consul-a-service-discovery-system-on-ubuntu-14-04
 * https://gorails.com/setup/ubuntu/14.04
+* [Remote Checks In Consul - Mailing List](https://groups.google.com/forum/#!searchin/consul-tool/external/consul-tool/7MOQR6tSsqA/7QEqCGslpu8J)
+* [Script check for external service - Github Issue](https://github.com/hashicorp/consul/issues/259)
