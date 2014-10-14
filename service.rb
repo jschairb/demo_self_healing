@@ -15,7 +15,7 @@ class ResolvDNSAdapter
   end
 
   def cname(hostname)
-    @dns.getresources(hostname, Resolv::DNS::Resource::IN::CNAME).first.name
+    @dns.getresources(hostname, Resolv::DNS::Resource::IN::CNAME).first.name.to_s
   end
 end
 
@@ -28,7 +28,7 @@ class ExternalServiceHostname
   end
 
   def resolved
-    dns.cname(hostname)
+    @dns.cname(hostname)
   end
 
   def to_s
@@ -37,7 +37,7 @@ class ExternalServiceHostname
 end
 
 class ExternalResponse
-  attr_reader :attributes
+  attr_reader :attributes, :external_service
 
   def initialize(external_service)
     @external_service = external_service
@@ -81,6 +81,8 @@ class ExternalResponse
 end
 
 class ExternalService
+  attr_reader :hostname
+
   def initialize(hostname, resolver)
     @hostname = ExternalServiceHostname.new(hostname, resolver)
   end
@@ -90,7 +92,7 @@ class ExternalService
   end
 
   def token_url
-    "#{resolved_hostname}/token"
+    "http://#{resolved_hostname}/token"
   end
 end
 
@@ -100,11 +102,11 @@ RESOLVER = ResolvDNSAdapter.new(CONFIG[:nameserver])
 
 configure do
   set :external_service, ExternalService.new(CONFIG[:external_hostname],
-                                             resolver)
+                                             RESOLVER)
 end
 
 get '/' do
-  response = ExternalResponse.new(external_service)
+  response = ExternalResponse.new(settings.external_service)
   response.fetch
   response.to_json
 end
