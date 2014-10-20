@@ -12,7 +12,7 @@ helpers do
   def get_external_response(url)
     response = begin
       RestClient.get(url)
-    rescue RestClient::InternalServerError
+    rescue uRestClient::InternalServerError
       require 'ostruct'
       OpenStruct.new(code: 500, body: '{"msg": "there was an error"}')
     end
@@ -45,7 +45,7 @@ get '/' do
                                               CONFIG[:external_hostname])
 
   external_response = get_external_response(external_hostname)
-  remove_url_from_consul if external_response.fetch(:status, 200).to_i != 200
+  mark_http_check_critical if external_response.fetch(:status, 200).to_i != 200
   {
     local_hostname: Socket.gethostname,
     resolved_hostname: external_hostname,
