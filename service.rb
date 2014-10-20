@@ -12,7 +12,7 @@ helpers do
   def get_external_response(url)
     response = begin
       RestClient.get(url)
-    rescue uRestClient::InternalServerError
+    rescue RestClient::InternalServerError
       require 'ostruct'
       OpenStruct.new(code: 500, body: '{"msg": "there was an error"}')
     end
