@@ -10,7 +10,12 @@ CONFIG   = YAML.load_file("config.yml")
 
 helpers do
   def get_external_response(url)
-    response = RestClient.get(url)
+    response = begin
+      RestClient.get(url)
+    rescue RestClient::InternalServerError
+      require 'ostruct'
+      OpenStruct.new(code: 500, body: '{"msg": "there was an error"}')
+    end
 
     {}.tap do |external_response|
       external_response[:status] = response.code
