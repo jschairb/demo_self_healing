@@ -10,7 +10,7 @@ CONFIG   = YAML.load_file("config.yml")
 
 helpers do
   def get_external_response(url)
-    response = RestClient.get(external_service.token_url)
+    response = RestClient.get(url)
 
     {}.tap do |external_response|
       external_response[:status] = response.code
@@ -20,7 +20,7 @@ helpers do
                     rescue JSON::ParserError => error
                       { error: response.body }
                     end
-      external_response.merge(parsed_body)
+      external_response.merge!(parsed_body)
     end
   end
 
@@ -39,7 +39,7 @@ get '/' do
   external_hostname = resolved_hostname_cname(CONFIG[:nameserver],
                                               CONFIG[:external_hostname])
 
-  external_response = get_external_response(url)
+  external_response = get_external_response(external_hostname)
   remove_url_from_consul if external_response.fetch(:status, 200).to_i != 200
   {
     local_hostname: Socket.gethostname,
